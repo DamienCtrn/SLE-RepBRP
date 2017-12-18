@@ -9,42 +9,36 @@
 PREDICTOR::PREDICTOR(char *prog, int argc, char *argv[])
 {
    // La trace est tjs présente, et les arguments sont ceux que l'on désire
-   if (argc != 1) {
-      fprintf(stderr, "usage: %s <trace> history_length\n", prog);
+   if (argc != 2) {
+      fprintf(stderr, "usage: %s <trace> pcbits countbits\n", prog);
       exit(-1);
    }
 
-   history_length = strtoul(argv[0], NULL, 0);
+   uint32_t pcbits    = strtoul(argv[0], NULL, 0);
+   uint32_t countbits = strtoul(argv[1], NULL, 0);
 
-   // nombre d'entrées dans la table
-   uint32_t nb_enties = (1 << history_length);
-   // Construction du masque
-   history_mask = 1;
-   for (size_t i = 0; i < history_length - 1; i++) {
-	   history_mask << 1;
-	   history_mask ++;
-   }
-   // Allocation de la table
-   table = new uint32_t[nb_enties]();
-   history = 0;
+   nentries = (1 << pcbits);        // nombre d'entrées dans la table
+   pcmask   = (nentries - 1);       // masque pour n'accéder qu'aux bits significatifs de PC
+   countmax = (1 << countbits) - 1; // valeur max atteinte par le compteur à saturation
+   table    = new uint32_t[nentries]();
 }
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 
-bool PREDICTOR::GetPrediction()
+bool PREDICTOR::GetPrediction(UINT64 PC)
 {
-	return table[history & history_mask];
+   uint32_t v = table[PC & pcmask];
+   return (v > (countmax / 2)) ? TAKEN : NOT_TAKEN;
 }
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 
-void PREDICTOR::UpdatePredictor(bool resolveDir)
+void PREDICTOR::UpdatePredictor(UINT64 PC, OpType opType, bool resolveDir, bool predDir, UINT64 branchTarget)
 {
-	table[history & history_mask] = resolveDir;
-	history << 1;
-	history = (resolveDir == TAKEN) ? history + 1 : history;
+   uint32_t v = table[PC & pcmask];
+   table[PC & pcmask] = (resolveDir == TAKEN) ? SatIncrement(v, countmax) : SatDecrement(v);
 }
 
 /////////////////////////////////////////////////////////////

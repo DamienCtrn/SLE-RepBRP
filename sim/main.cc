@@ -2,7 +2,7 @@
 //  Copyright 2015 Samsung Austin Semiconductor, LLC.                //
 ///////////////////////////////////////////////////////////////////////
 
-//Description : Main file for CBP2016 
+//Description : Main file for CBP2016
 
 #include <assert.h>
 #include <stdlib.h>
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 
    PREDICTOR *brpred = new PREDICTOR(argv[0], argc - 2, &argv[2]);	// this instantiates the predictor code
    ///////////////////////////////////////////////
-   // read each trace recrod, simulate until done
+   // read each trace record, simulate until done
    ///////////////////////////////////////////////
 
    std::string trace_path;
@@ -133,10 +133,10 @@ int main(int argc, char *argv[])
    bt9_reader.header.getFieldValueStr(key, value);
    UINT64 branch_instruction_counter = std::stoull(value, nullptr, 0);
    UINT64 numMispred = 0;
-//ver2    UINT64     numMispred_btbMISS =0;  
-//ver2    UINT64     numMispred_btbANSF =0;  
-//ver2    UINT64     numMispred_btbATSF =0;  
-//ver2    UINT64     numMispred_btbDYN =0;  
+//ver2    UINT64     numMispred_btbMISS =0;
+//ver2    UINT64     numMispred_btbANSF =0;
+//ver2    UINT64     numMispred_btbATSF =0;
+//ver2    UINT64     numMispred_btbDYN =0;
 
    UINT64 cond_branch_instruction_counter = 0;
 //ver2     UINT64 btb_ansf_cond_branch_instruction_counter=0;
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 //ver2    ///////////////////////////////////////////////
 //ver2    // model simple branch marking structure
 //ver2    ///////////////////////////////////////////////
-//ver2    std::map<UINT64, UINT32> myBtb; 
+//ver2    std::map<UINT64, UINT32> myBtb;
 //ver2    map<UINT64, UINT32>::iterator myBtbIterator;
 //ver2
 //ver2    myBtb.clear();
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 //ver2              //printf("BTB miss ");
 //ver2              myBtb.insert(pair<UINT64, UINT32>(PC, (UINT32)branchTaken)); //on a miss insert with outcome (N->btbANSF, T->btbATSF)
 //ver2              predDir = brpred->GetPrediction(PC, btbANSF, btbATSF, btbDYN);
-//ver2              brpred->UpdatePredictor(PC, opType, branchTaken, predDir, branchTarget, btbANSF, btbATSF, btbDYN); 
+//ver2              brpred->UpdatePredictor(PC, opType, branchTaken, predDir, branchTarget, btbANSF, btbATSF, btbDYN);
 //ver2            }
 //ver2            else {
 //ver2              btbANSF = (myBtbIterator->second == 0);
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
 //ver2              //printf("BTB hit ANSF: %d ATSF: %d DYN: %d ", btbANSF, btbATSF, btbDYN);
 //ver2
 //ver2              predDir = brpred->GetPrediction(PC, btbANSF, btbATSF, btbDYN);
-//ver2              brpred->UpdatePredictor(PC, opType, branchTaken, predDir, branchTarget, btbANSF, btbATSF, btbDYN); 
+//ver2              brpred->UpdatePredictor(PC, opType, branchTaken, predDir, branchTarget, btbANSF, btbATSF, btbDYN);
 //ver2
 //ver2              if (  (btbANSF && branchTaken)   // only exhibited N until now and we just got a T -> upgrade to dynamic conditional
 //ver2                 || (btbATSF && !branchTaken)  // only exhibited T until now and we just got a N -> upgrade to dynamic conditional
@@ -290,11 +290,11 @@ int main(int argc, char *argv[])
 
             bool predDir = false;
 
-            predDir = brpred->GetPrediction(PC);
+            predDir = brpred->GetPrediction();
 #if 0
             printf("PC: %llx outcome: %d, prediction: %d\n", PC, branchTaken, predDir);
 #endif
-            brpred->UpdatePredictor(PC, opType, branchTaken, predDir, branchTarget);
+            brpred->UpdatePredictor(branchTaken);
 
             if (predDir != branchTaken) {
                numMispred++;    // update mispred stats
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
 
    //NOTE: competitors are judged solely on MISPRED_PER_1K_INST. The additional stats are just for tuning your predictors.
 
-   printf("  TRACE               \t : %s %d %d\n", trace_path.c_str(), brpred->nentries, brpred->countmax);
+   printf("  TRACE               \t : %s %d\n", trace_path.c_str(), brpred->history_length);
    printf("  NUM_INSTRUCTIONS    \t : %10llu\n", total_instruction_counter);
    printf("  NUM_BR              \t : %10llu\n", branch_instruction_counter - 1);	//JD2_2_2016 NOTE there is a dummy branch at the beginning of the trace...
    printf("  NUM_UNCOND_BR       \t : %10llu\n", uncond_branch_instruction_counter);
