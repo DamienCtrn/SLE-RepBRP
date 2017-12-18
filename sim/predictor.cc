@@ -9,7 +9,7 @@
 PREDICTOR::PREDICTOR(char *prog, int argc, char *argv[])
 {
    // La trace est tjs présente, et les arguments sont ceux que l'on désire
-   if (argc != 1) {
+   if (argc != 2) {
       fprintf(stderr, "usage: %s <trace> history_length\n", prog);
       exit(-1);
    }
@@ -21,7 +21,7 @@ PREDICTOR::PREDICTOR(char *prog, int argc, char *argv[])
    // Construction du masque
    history_mask = 1;
    for (size_t i = 0; i < history_length - 1; i++) {
-	   history_mask << 1;
+	   history_mask <<= 1;
 	   history_mask ++;
    }
    // Allocation de la table
@@ -43,7 +43,7 @@ bool PREDICTOR::GetPrediction()
 void PREDICTOR::UpdatePredictor(bool resolveDir)
 {
 	table[history & history_mask] = resolveDir;
-	history << 1;
+	history <<= 1;
 	history = (resolveDir == TAKEN) ? history + 1 : history;
 }
 

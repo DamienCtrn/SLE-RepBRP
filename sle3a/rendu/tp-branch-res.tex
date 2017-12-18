@@ -29,45 +29,36 @@
 \large
 Travaux Pratiques Archi SLE-3A\\
 \LARGE
-Prédiction de branchements\\
+Prédicteur Global de branchements\\
 \large
 
 \end{center}
 \section{Identification}
-Travail réalisé par Frédéric Pétrot
+Travail réalisé par Damien Cathrine
 
-\section{Prédicteur $n$ modal : conception et résultats}
+\section{Prédicteur Global : conception et résultats}
 \subsection{Conception}
-Le prédicteur $n$ modal bit est constitué d'un unique tableau contenant de $2^1$ à $2^3$ bits.
+Le prédicteur implémenté est le prédicteur global utilisant un historique.
+La longueur de l'historique est fixée par le premier paramètre donné au simulateur.
+L'historique est réalisé avec un entier et un masque. La valeur de cet historique sert
+ensuite à accèder aux valeurs (TAKEN ou NOT-TAKEN) enregistrée dans un tableau.
+
+Pour prédire un branchement, on consulte la valeur de la table à l'adresse
+\textit{historique} qui nous donne la prédiction.
+
+Lors de la mise à jour, la valeur actuelle du branchement est mise à jour avec l'historique actuel.
+Puis l'historique est décalé de la valeur actuelle du branchement.
 
 \subsection{Résultats}
-Les résultats issus de la simulation sont les suivants.
+Les résultats issus de la simulation sont les suivants,
+\texttt{table size} représente la longueur de l'historique.
 \par
 \begin{minipage}{.48\linewidth}
 \includegraphics[width=\linewidth]{graph_1}
 \end{minipage}%
-\hfill
-\begin{minipage}{.48\linewidth}
-\includegraphics[width=\linewidth]{graph_2}
-\end{minipage}
 
-\begin{minipage}{.48\linewidth}
-\includegraphics[width=\linewidth]{graph_3}
-\end{minipage}%
-\hfill
-\begin{minipage}{.48\linewidth}
-\includegraphics[width=\linewidth]{graph_4}
-\end{minipage}
-
-\begin{minipage}{.48\linewidth}
-\includegraphics[width=\linewidth]{graph_5}
-\end{minipage}%
-\hfill
-\begin{minipage}{.48\linewidth}
-\includegraphics[width=\linewidth]{graph_6}
-\end{minipage}
 \subsection{Analyse}
-On voit une asymptote due à la disparition des collisions lorsque la taille du prédicteur augmente.
-Le coût du prédicteur est linéaire avec la taille du tableau, et il n'est pas raisonnable de dépasser $2^{16}$ éléments, d'autant que le gain à partir de $2^{12}$ devient très faible.
-Par ailleurs, il y a toujours moins de $7\%$ de mauvaise prédictions, ce qui est remarquable pour une approche aussi simpliste.
+On voit qu'il est utile pour certains test d'avoir un historique plus long.
+Cependant pour d'autre, la longueur ne change rien, utiliser un deuxième prédicteur
+en parallèle pourrait alors s'avèrer utile.
 \end{document}
